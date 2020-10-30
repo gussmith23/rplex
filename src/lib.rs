@@ -205,6 +205,8 @@ pub enum EnvParam {
     /// docs](https://www.ibm.com/support/knowledgecenter/SSSA5P_12.7.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/HeurFreq.html):
     /// "MIP heuristic frequency"
     MIPStrategyHeuristicFreq(i64),
+    TimeLimit(f64),
+    DetTimeLimit(f64),
 }
 
 impl EnvParam {
@@ -220,6 +222,8 @@ impl EnvParam {
             &MIPLimitsSolutions(_) => 2015,
             &MIPLimitsCutPasses(_) => 2056,
             &MIPStrategyHeuristicFreq(_) => 2031,
+            &DetTimeLimit(_) => 1127,
+            &TimeLimit(_) => 1039,
         }
     }
 
@@ -236,6 +240,8 @@ impl EnvParam {
             &MIPLimitsSolutions(s) => Long(s as c_long),
             &MIPLimitsCutPasses(p) => Long(p as c_long),
             &MIPStrategyHeuristicFreq(f) => Long(f as c_long),
+            &DetTimeLimit(t) => Double(t as c_double),
+            &TimeLimit(t) => Double(t as c_double),
         }
     }
 }
