@@ -197,6 +197,14 @@ pub enum EnvParam {
     /// docs](https://www.ibm.com/support/knowledgecenter/SSSA5P_12.9.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/IntSolLim.html):
     /// "MIP integer solution limit"
     MIPLimitsSolutions(i64),
+    /// From [CPLEX
+    /// docs](https://www.ibm.com/support/knowledgecenter/SSSA5P_12.7.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/CutPass.html):
+    /// "Number of cutting plane passes"
+    MIPLimitsCutPasses(i64),
+    /// From [CPLEX
+    /// docs](https://www.ibm.com/support/knowledgecenter/SSSA5P_12.7.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/HeurFreq.html):
+    /// "MIP heuristic frequency"
+    MIPStrategyHeuristicFreq(i64),
 }
 
 impl EnvParam {
@@ -210,6 +218,8 @@ impl EnvParam {
             &MIPEmphasis(_) => 2058,
             &MIPStrategyProbe(_) => 2042,
             &MIPLimitsSolutions(_) => 2015,
+            &MIPLimitsCutPasses(_) => 2056,
+            &MIPStrategyHeuristicFreq(_) => 2031,
         }
     }
 
@@ -224,6 +234,8 @@ impl EnvParam {
             &MIPEmphasis(e) => Integer(e as c_int),
             &MIPStrategyProbe(p) => Integer(p as c_int),
             &MIPLimitsSolutions(s) => Long(s as c_long),
+            &MIPLimitsCutPasses(p) => Long(p as c_long),
+            &MIPStrategyHeuristicFreq(f) => Long(f as c_long),
         }
     }
 }
