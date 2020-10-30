@@ -183,6 +183,14 @@ pub enum EnvParam {
     /// When true, set CPX_PARALLEL_DETERMINISTIC (default). When false, set
     /// CPX_PARALLEL_OPPORTUNISTIC.
     ParallelDeterministic(bool),
+    /// Determines how aggressive the probing phase is. See [CPLEX
+    /// docs](https://www.ibm.com/support/knowledgecenter/SSSA5P_12.7.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/Probe.html)
+    MIPStrategyProbe(i32),
+    /// From [CPLEX
+    /// docs](https://www.ibm.com/support/knowledgecenter/SSSA5P_12.9.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/MIPEmphasis.html):
+    /// "Controls trade-offs between speed, feasibility, optimality, and moving
+    /// bounds in MIP."
+    MIPEmphasis(i32),
 }
 
 impl EnvParam {
@@ -193,6 +201,8 @@ impl EnvParam {
             &ScreenOutput(_) => 1035,
             &RelativeGap(_) => 2009,
             &ParallelDeterministic(_) => 1109,
+            &MIPEmphasis(_) => 2058,
+            &MIPStrategyProbe(_) => 2042,
         }
     }
 
@@ -204,6 +214,8 @@ impl EnvParam {
             &ScreenOutput(b) => Boolean(b as c_int),
             &RelativeGap(g) => Double(g as c_double),
             &ParallelDeterministic(b) => Integer(if b { 1 } else { -1 }),
+            &MIPEmphasis(e) => Integer(e as c_int),
+            &MIPStrategyProbe(p) => Integer(p as c_int),
         }
     }
 }
