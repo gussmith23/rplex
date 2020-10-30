@@ -42,7 +42,7 @@
 //! }
 //! ```
 extern crate libc;
-use libc::{c_int, c_char, c_double};
+use libc::{c_long, c_int, c_char, c_double};
 use std::ffi::CString;
 
 /// Used by CPLEX to represent a variable that has no upper bound.
@@ -61,6 +61,7 @@ extern "C" {
     fn CPXopenCPLEX(status: *mut c_int) -> *mut CEnv;
     fn CPXcreateprob(env: *mut CEnv, status: *mut c_int, name: *const c_char) -> *mut CProblem;
     fn CPXsetintparam(env: *mut CEnv, param: c_int, value: c_int) -> c_int;
+    fn CPXsetlongparam(env: *mut CEnv, param: c_int, value: c_long) -> c_int;
     fn CPXsetdblparam(env: *mut CEnv, param: c_int, value: c_double) -> c_int;
     fn CPXgetintparam(env: *mut CEnv, param: c_int, value: *mut c_int) -> c_int;
     fn CPXchgprobtype(env: *mut CEnv, lp: *mut CProblem, ptype: c_int) -> c_int;
@@ -173,6 +174,7 @@ enum ParamType {
     Integer(c_int),
     Double(c_double),
     Boolean(c_int),
+    Long(c_long),
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -191,6 +193,10 @@ pub enum EnvParam {
     /// "Controls trade-offs between speed, feasibility, optimality, and moving
     /// bounds in MIP."
     MIPEmphasis(i32),
+    /// From [CPLEX
+    /// docs](https://www.ibm.com/support/knowledgecenter/SSSA5P_12.9.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/IntSolLim.html):
+    /// "MIP integer solution limit"
+    MIPLimitsSolutions(i64),
 }
 
 impl EnvParam {
@@ -203,6 +209,7 @@ impl EnvParam {
             &ParallelDeterministic(_) => 1109,
             &MIPEmphasis(_) => 2058,
             &MIPStrategyProbe(_) => 2042,
+            &MIPLimitsSolutions(_) => 2015,
         }
     }
 
@@ -216,6 +223,7 @@ impl EnvParam {
             &ParallelDeterministic(b) => Integer(if b { 1 } else { -1 }),
             &MIPEmphasis(e) => Integer(e as c_int),
             &MIPStrategyProbe(p) => Integer(p as c_int),
+            &MIPLimitsSolutions(s) => Long(s as c_long),
         }
     }
 }
@@ -257,6 +265,7 @@ impl Env {
                 ParamType::Integer(i) => CPXsetintparam(self.inner, p.to_id(), i),
                 ParamType::Boolean(b) => CPXsetintparam(self.inner, p.to_id(), b),
                 ParamType::Double(d) => CPXsetdblparam(self.inner, p.to_id(), d),
+                ParamType::Long(l) => CPXsetlongparam(self.inner, p.to_id(), l),
             };
 
             if status != 0 {
